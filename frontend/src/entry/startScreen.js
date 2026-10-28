@@ -5,6 +5,18 @@ import { createLogo } from '../ui/logo.js';
 import { ENTRY_POINTS } from './entryPoints.js';
 
 export const START_FOOTNOTE = 'Designs are illustrative previews and are not manufacturing drawings.';
+const HERO_VIDEO = '/media/wardrobe-hero.mp4';
+
+/** Decorative full-bleed background loop. Stays on its first frame when the user prefers reduced motion. */
+function heroVideo() {
+  const video = el('video', { className: 'start__video', attrs: { src: HERO_VIDEO, 'aria-hidden': 'true', preload: 'auto' } });
+  Object.assign(video, { muted: true, loop: true, playsInline: true, disablePictureInPicture: true });
+  if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    video.autoplay = true;
+    video.play().catch(() => {}); // autoplay can be refused; the first frame still shows
+  }
+  return video;
+}
 
 export function mountStartScreen({ onChoose }) {
   const cards = ENTRY_POINTS.map((entry) => {
@@ -28,6 +40,8 @@ export function mountStartScreen({ onChoose }) {
   });
 
   const dialog = el('dialog', { className: 'start', attrs: { 'aria-labelledby': 'start-title' } }, [
+    heroVideo(),
+    el('div', { className: 'start__scrim', attrs: { 'aria-hidden': 'true' } }),
     el('header', { className: 'start__bar' }, [createLogo({ size: 36 })]),
     el('main', { className: 'start__main' }, [
       el('h1', { className: 'start__title', text: 'Design your wardrobe', attrs: { id: 'start-title' } }),
